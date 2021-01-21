@@ -29,12 +29,9 @@
 
 
 
-export class Value {
+export class Expression { }
 
-}
-
-
-export class Num extends Value {
+export class Num extends Expression {
     #val
     constructor(val) {
         super()
@@ -46,8 +43,9 @@ export class Num extends Value {
     }
 }
 
-export class Call extends Value {
-    static funcs = new Map()
+const runtime = new Map()
+
+export class Call extends Expression {
     #argus
     #ref
     constructor(ref, argus = []) {
@@ -56,59 +54,92 @@ export class Call extends Value {
         this.#argus = argus
     }
     eval() {
-        if (!Call.funcs.has(this.#ref)) throw new Error(`${this.#ref} is undefined!!!`)
-        const fn = Call.funcs.get(this.#ref)
+        if (!runtime.has(this.#ref)) throw new Error(`${this.#ref} is undefined!!!`)
+        const fn = runtime.get(this.#ref)
         return fn(...this.#argus.map(v => v.eval()))
     }
 }
 
+const globe = new Map()
 
+export class Ref extends Expression {
+    #id
+    constructor(id) {
+        super()
+        this.#id = id
+    }
+    eval() {
+        if (!globe.has(this.#id)) throw new Error(`${this.#id} is undefinded!!!`)
+        return globe.get(this.#id).eval()
+    }
+}
+
+export class Func extends Expression{
+    #id
+    constructor(id) {
+        super()
+        this.#id = id
+    }
+    eval() {
+        if (!globe.has(this.#id)) throw new Error(`${this.#id} is undefinded!!!`)
+        return globe.get(this.#id).eval()
+    }
+}
+
+const def = (name, val) => {
+    globe.set(name, val)
+    return new Ref(name)
+}
+
+const val = (name) => new Ref(name)
 
 const num = val => new Num(val)
 
 const add = ((ref) => {
-    Call.funcs.set(ref, (a, b) => (a + b))
+    runtime.set(ref, (a, b) => (a + b))
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('add'))
 
 const sub = ((ref) => {
-    Call.funcs.set(ref, (a, b) => (a - b))
+    runtime.set(ref, (a, b) => (a - b))
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('sub'))
 
 const mul = ((ref) => {
-    Call.funcs.set(ref, (a, b) => (a * b))
+    runtime.set(ref, (a, b) => (a * b))
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('mul'))
 
 const div = ((ref) => {
-    Call.funcs.set(ref, (a, b) => (a / b))
+    runtime.set(ref, (a, b) => (a / b))
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('div'))
 
 const lines = ((ref) => {
-    Call.funcs.set(ref, (...argus) => argus.reduce((_, b) => b))
+    runtime.set(ref, (...argus) => argus.reduce((_, b) => b))
     return (...argus) => new Call(ref, argus)
 })(Symbol('lines'))
 
-
 const log = ((ref) => {
-    Call.funcs.set(ref, (val) => {
+    runtime.set(ref, (val) => {
         console.log(val)
         return val
     })
     return (val) => new Call(ref, [val])
 })(Symbol('log'))
 
+const apply = (fn) => {
 
+}
 
-const evalFunc = (a)=>{
+const evalFunc = (a) => {
     console.log(a)
-  return  ()=> a.eval()
+    return () => a.eval()
 }
 
 
 export const main = evalFunc(lines(
-    // def('value', (add(num(1), num(2)), num(3))),
-    log(div(sub(mul(add(num(1), num(2)), num(3)), num(4)), num(5)))
+    def('value', add(num(1), num(2)), num(3)),
+    // def('add_1', func(argus(x), num(2)), num(3))),
+    log(div(sub(mul(add(num(1), val('value')), num(3)), num(4)), num(5)))
 ))
