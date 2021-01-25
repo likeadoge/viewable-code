@@ -57,8 +57,10 @@ export class Ref extends Expr {
     static css = `
         .expr.ref {
             display:inline-block;
-            background:#666;
-            color:#fff;
+            // background:#666;
+            // color:#fff;
+            color:#666;
+            background:transparent;
             line-height:32px;
             padding: 0 12px;
         }
@@ -70,7 +72,7 @@ export class Ref extends Expr {
     }
 
     render() {
-        return `<div class="ref expr">${this.#name}</div>`
+        return `<div class="ref expr">{ ${this.#name} }</div>`
     }
 }
 
