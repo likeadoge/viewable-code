@@ -60,36 +60,38 @@ export class Call extends Expression {
     }
 }
 
-const globe = new Map()
+// const globe = new Map()
 
 export class Ref extends Expression {
+    static table = new Map()
+    static globe = []
+
+    static generate(name,val){
+        Ref.globe.push(val)
+        Ref.table.set(name,Ref.globe.length-1)
+        return new Ref(name)
+    }
     #id
     constructor(id) {
         super()
         this.#id = id
     }
     eval() {
-        if (!globe.has(this.#id)) throw new Error(`${this.#id} is undefinded!!!`)
-        return globe.get(this.#id).eval()
+        if (!Ref.table.has(this.#id)) throw new Error(`${this.#id} is undefinded!!!`)
+        return (Ref.globe[Ref.table.get(this.#id)]).eval() 
     }
 }
 
 export class Func extends Expression{
-    #id
-    constructor(id) {
-        super()
-        this.#id = id
-    }
-    eval() {
-        if (!globe.has(this.#id)) throw new Error(`${this.#id} is undefinded!!!`)
-        return globe.get(this.#id).eval()
-    }
+    #argus = []
+    #body = []
+    
+
 }
 
-const def = (name, val) => {
-    globe.set(name, val)
-    return new Ref(name)
-}
+const def = (name, val) => Ref.generate(name,val)
+
+const fun = (argus,body)=> new Func(argus,body)
 
 const val = (name) => new Ref(name)
 
@@ -105,11 +107,11 @@ const sub = ((ref) => {
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('sub'))
 
-const mul = ((ref) => {
+const mul = ((ref) => { 
     runtime.set(ref, (a, b) => (a * b))
     return (a, b) => new Call(ref, [a, b])
 })(Symbol('mul'))
-
+   
 const div = ((ref) => {
     runtime.set(ref, (a, b) => (a / b))
     return (a, b) => new Call(ref, [a, b])
@@ -120,7 +122,7 @@ const lines = ((ref) => {
     return (...argus) => new Call(ref, argus)
 })(Symbol('lines'))
 
-const log = ((ref) => {
+const log = ((ref) => { 
     runtime.set(ref, (val) => {
         console.log(val)
         return val
@@ -136,7 +138,6 @@ const evalFunc = (a) => {
     console.log(a)
     return () => a.eval()
 }
-
 
 export const main = evalFunc(lines(
     def('value', add(num(1), num(2)), num(3)),
