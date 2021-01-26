@@ -188,7 +188,7 @@ export class Call extends Expr {
     render() {
         return `
         <div class="call expr" id="${this.eid}">
-            <div class="fn" title="ondblclick = fnEval()" ondblclick="fnEval('${this.eid}')">
+            <div class="fn" title="双击执行" ondblclick="fnEval('${this.eid}')">
             ${this.#fn.render()}
             </div>
         
