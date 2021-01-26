@@ -1,7 +1,7 @@
-import { Ref, Call, Lines, Def, Num } from './_index.js'
+import { Ref, Call, Def, Num } from './_index.js'
 
 
-const lines = (...argus) => new Lines(argus)
+const lines = (...argus) => new Call(new Ref('lines'), argus)
 const def = (name, value) => new Def(name, value)
 const val = (name) => new Ref(name)
 const num = (n) => new Num(n)
@@ -16,7 +16,7 @@ const log = (a) => new Call(new Ref('log'), [a])
 export default () => {
     const main = lines(
         def('value', add(num(1), num(2)), num(3)),
-        log(div(sub(mul(add(num(1), val('value')), num(3)), num(4)), num(5)))
+        log(div(sub(mul(add(num(1), num(2)), num(3)), num(4)), num(5)))
     )
 
     console.log(main)
