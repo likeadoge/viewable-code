@@ -74,7 +74,7 @@ export class Num extends Expr {
 
     static css = `
         .expr.num{
-            background:crimson;
+            background:LightSlateBlue;
             display:inline-block;
             padding:0 12px;
             color:#fff;
@@ -91,6 +91,50 @@ export class Num extends Expr {
         return `<div class="num expr">${this.#n}</div>`
     }
 }
+
+export class Bool extends Expr {
+    #n
+
+    static and(a, b) {
+        return new Bool(a.#n && b.#n)
+    }
+
+    static or(a, b) {
+        return new Bool(a.#n || b.#n)
+    }
+
+    static not(a) {
+        return new Bool(!a.#n)
+    }
+
+    static css = `
+        .expr.bool{
+            background:crimson;
+            display:inline-block;
+            padding:0 12px;
+            color:#fff;
+            text-align:center;
+        }
+        .expr.bool.true{
+            background:aquamarine;
+            color:#333;
+        }
+        .expr.bool.false{
+            background:crimson;
+        }
+    
+    `
+
+    constructor(n) {
+        super()
+        this.#n = n
+    }
+
+    render() {
+        return `<div class="bool expr ${this.#n}">${this.#n}</div>`
+    }
+}
+
 
 export class Ref extends Expr {
     static css = `
@@ -246,12 +290,15 @@ new LocalFunc('+', ((a, b) => Num.add(a, b)))
 new LocalFunc('-', ((a, b) => Num.sub(a, b)))
 new LocalFunc('*', ((a, b) => Num.mul(a, b)))
 new LocalFunc('/', ((a, b) => Num.div(a, b)))
+new LocalFunc('&&', ((a, b) => Bool.and(a, b)))
+new LocalFunc('||', ((a, b) => Bool.or(a, b)))
+new LocalFunc('!not', ((a) => Bool.not(a)))
 new LocalFunc('log', ((a) => (console.log(a), a)))
-new LocalFunc('lines', ((...argus) => argus.reduce((a,b)=>b)))
+new LocalFunc('lines', ((...argus) => argus.reduce((a, b) => b)))
 
 const style = document.createElement('style')
 
-style.innerHTML = [Expr, Num, Ref, Def, Call]
+style.innerHTML = [Expr, Num, Ref, Def, Call,Bool]
     .map(v => v.css || '')
     .join('')
 
