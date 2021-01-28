@@ -35,11 +35,19 @@ export class Expr {
         return `<div class="expr">(undone)</div>`
     }
 
+    eval(scope = Scope.globe) {
+        return this
+    }
 }
 
 export class Scope {
-    static globe = new Scope()
     static runtime = new Scope()
+    static globe = new Scope(Scope.runtime)
+
+    #parent = null
+    constructor(parent = null) {
+        this.#parent = parent
+    }
 
     #map = new Map()
 
@@ -48,8 +56,18 @@ export class Scope {
     }
 
     get(name) {
-        if (!this.#map.has(name)) throw new Error(`${name} is undefined`)
-        return this.#map.get(name)
+        if (this.#map.has(name))
+            return this.#map.get(name)
+        if (this.#parent)
+            return this.#parent.get(name)
+        else
+            throw new Error(`${name} is undefined`)
+    }
+
+    has(name) {
+        return (
+            this.#map.has(name) || (this.#parent && this.#parent.has(name))
+        )
     }
 }
 
@@ -135,8 +153,8 @@ export class Bool extends Expr {
     }
 }
 
-
 export class Ref extends Expr {
+
     static css = `
         .expr.ref {
             display:inline-block;
@@ -149,6 +167,7 @@ export class Ref extends Expr {
         }
     `
     #name = ''
+
     constructor(name) {
         super()
         this.#name = name
@@ -158,7 +177,7 @@ export class Ref extends Expr {
         return `<div class="ref expr">{ ${this.#name} }</div>`
     }
 
-    val(scope = Scope.globe) {
+    eval(scope = Scope.globe) {
         return scope.get(this.#name)
     }
 }
@@ -197,6 +216,11 @@ export class Def extends Expr {
             ${this.#value.render()}
             </div>
         </div>`
+    }
+
+    val(scope = Scope.globe) {
+        scope.set(this.#name, this.#value)
+        return scope.get(this.#name)
     }
 }
 
@@ -243,18 +267,15 @@ export class Call extends Expr {
         `
     }
 
-    eval() {
+    eval(scope = Scope.globe) {
         const argus = this.#argus.map(v => {
-            if (v instanceof Call) {
-                return v.eval()
-            }
             if (v instanceof Expr) {
-                return v
+                return v.eval(scope)
             }
             throw new Error('type error of expr')
         })
 
-        const fn = this.#fn instanceof Ref ? this.#fn.val() : this.#fn
+        const fn = this.#fn.eval(scope)
 
         if (fn instanceof Func) {
             const node = fn.apply(argus)
@@ -265,7 +286,6 @@ export class Call extends Expr {
         throw new Error('not function!!!')
     }
 }
-
 
 export class Func extends Expr {
     apply() { }
@@ -284,7 +304,52 @@ export class LocalFunc extends Func {
     }
 }
 
+export class Lambda extends Func {
 
+    #scope = null
+    #argus = []
+    #body = null
+
+    static css = `
+        .expr.lambda{
+            border: 3px dashed #333;
+            background:Plum;
+        }
+    `
+
+    constructor(argus, body) {
+        super()
+        this.#argus = argus
+        this.#body = body
+    }
+
+
+    render() {
+        return `
+        <div class="expr lambda">
+            <div class="argus">
+                ${this.#argus.map(v => `${v}`).join(' , ')}
+            </div>
+
+            <div class="body">
+                ${this.#body.render()}
+            </div>
+        </div>
+        `
+    }
+
+    eval(scope = Scope.globe) {
+        if (!this.#scope) { this.#scope = new Scope(scope) }
+        return this
+    }
+
+    apply(argus) {
+        this.#argus.forEach((name, index) => {
+            this.#scope.set(name, argus[index])
+        })
+        return this.#body.eval(this.#scope)
+    }
+}
 
 new LocalFunc('+', ((a, b) => Num.add(a, b)))
 new LocalFunc('-', ((a, b) => Num.sub(a, b)))
@@ -298,7 +363,7 @@ new LocalFunc('lines', ((...argus) => argus.reduce((a, b) => b)))
 
 const style = document.createElement('style')
 
-style.innerHTML = [Expr, Num, Ref, Def, Call,Bool]
+style.innerHTML = [Expr, Num, Ref, Def, Call, Bool, Lambda]
     .map(v => v.css || '')
     .join('')
 
