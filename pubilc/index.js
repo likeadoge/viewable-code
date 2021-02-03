@@ -1,5 +1,8 @@
-import main from './meta/main.js'
+import { Program, types } from './lang/index.js'
 
 
-main()
+const {Num} = types
+
+console.log(new Program(new Num(3)).render())
+
 
