@@ -1,4 +1,4 @@
-import { Ref, Call, Def, Num, Bool, Lambda } from './_index.js'
+import { Ref, Call, Def, Num, Bool, Lambda } from './index.js'
 
 
 const lines = (...argus) => new Call(new Ref('lines'), argus)
