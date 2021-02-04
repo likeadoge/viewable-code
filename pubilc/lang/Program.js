@@ -1,8 +1,8 @@
-import { Num } from './type/index.js'
+import { Num,Bool } from './type/index.js'
 import { Call } from './call.js'
 import { AstNode, AstLeafNode, AstBranchNode } from './base.js'
 
-const css = [AstNode, Num, Call]
+const css = [AstNode, Num, Call,Bool]
     .map(v => v.css)
     .flatMap(v => Object.entries(v))
     .map(([sel, values]) => `
@@ -19,7 +19,6 @@ style.innerHTML = css
 document.body.appendChild(style)
 
 export default class Program {
-
 
     #el = null
 
