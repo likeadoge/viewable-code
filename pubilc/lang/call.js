@@ -32,35 +32,22 @@ export class Call extends AstBranchNode {
         }
     }
 
-    static run(node){
-        const fn = node.extra.fn
-        const argus = node.children
-        const {use} = Object.getPrototypeOf(fn).constructor
-    
-        return use(fn,argus)
+    eval(){
+        return this.extra.fn.apply(this.children)
     }
 
-    static render(c) {
+    render() {
         return `
-        <div class="call expr" id="${c.eid}">
-            <div class="fn" title="双击执行" ondblclick="fnEval('${c.eid}')">
-            ${AstNode.render(c.extra.fn)}
+        <div class="call expr" id="${this.eid}">
+            <div class="fn" title="双击执行" ondblclick="fnEval('${this.eid}')">
+            ${this.extra.fn.render()}
             </div>
         
             <div>
-            ${c.children.map(v => AstNode.render(v)).join('')}
+            ${this.children.map(v => v.render()).join('')}
             </div>
         </div>
         `
     }
 }
 
-export class Ref extends AstBranchNode {
-    extra = { name: `` }
-    children = []
-
-    constructor(name) {
-        super()
-        this.extra.name = name
-    }
-}

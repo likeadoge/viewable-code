@@ -3,11 +3,6 @@ export class AstNode {
     extra = {}
     isLeaf = true
 
-    static render(a) {
-        const { render } = Object.getPrototypeOf(a).constructor
-        if (!render) throw new Error(`can't find render method!`)
-        return render(a)
-    }
 
     static css = {
         'body': {
@@ -18,6 +13,14 @@ export class AstNode {
             margin: '4px'
         }
     }
+
+    static assert(m){
+        if(! m instanceof this) {
+            console.error('it should be',this)
+            throw new Error('AstNode type Error!')
+        }
+    }
+
 }
 
 export class AstLeafNode {
@@ -27,10 +30,4 @@ export class AstLeafNode {
 export class AstBranchNode {
     isLeaf = false
     children = []
-
-    static run(node) {
-        const { run } = Object.getPrototypeOf(node).constructor
-        if (!run) throw new Error(`can't find run method!`)
-        return run(node)
-    }
 }

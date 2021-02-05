@@ -1,7 +1,6 @@
 import { AstLeafNode } from '../base.js'
 import { LocalFunc } from './Func.js'
 
-
 export default class Num extends AstLeafNode {
     kind = "num"
     extra = { n: 0 }
@@ -10,8 +9,8 @@ export default class Num extends AstLeafNode {
         this.extra.n = n
     }
 
-    static render(v) {
-        return `<div class="num expr">${v.extra.n}</div>`
+    render() {
+        return `<div class="num expr">${this.extra.n}</div>`
     }
 
     static css = {

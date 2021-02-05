@@ -32,7 +32,7 @@ export default class Program {
     }
 
     render() {
-        this.#el.innerHTML = AstNode.render(this.#main)
+        this.#el.innerHTML = this.#main.render()
     }
 
     next() {
@@ -61,7 +61,7 @@ export default class Program {
                 return [true, node]
             } else {
 
-                return [true, AstBranchNode.run(node)]
+                return [true, node.eval()]
             }
         }
 

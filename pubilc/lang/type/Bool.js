@@ -10,8 +10,8 @@ export default class Bool extends AstLeafNode {
         this.extra.n = n
     }
 
-    static render(v) {
-        return `<div class="bool expr ${v.extra.n}">${v.extra.n}</div>`
+    render() {
+        return `<div class="bool expr ${this.extra.n}">${this.extra.n}</div>`
     }
 
     static css = {

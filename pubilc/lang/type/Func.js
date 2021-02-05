@@ -12,14 +12,15 @@ export class LocalFunc extends AstLeafNode {
 
     static libs = new Map()
 
-    static render(c) {
-        return `<div>${c.extra.name}</div>`
+    render() {
+        return `<div>${this.extra.name}</div>`
     }
 
-    static use = (fn,argus) => {
-        const {name} = fn.extra
+    apply( argus){
+        const { name } = this.extra
         const _fn = LocalFunc.libs.get(name)
-        if(!_fn) throw new Error (`local_fn:${name} is undefined!`)
+        if (!_fn) throw new Error(`local_fn:${name} is undefined!`)
         return _fn(...argus)
     }
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
