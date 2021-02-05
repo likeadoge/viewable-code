@@ -1,5 +1,5 @@
-import { AstBranchNode, AstNode } from './base.js'
-
+import { AstBranchNode } from './base.js'
+import { Func } from './type/Func.js'
 
 export class Call extends AstBranchNode {
     extra = { fn: null }
@@ -7,6 +7,7 @@ export class Call extends AstBranchNode {
 
     constructor(fn, children) {
         super()
+        Func.assert(fn)
         this.extra.fn = fn
         this.children = children
     }
@@ -32,7 +33,7 @@ export class Call extends AstBranchNode {
         }
     }
 
-    eval(){
+    eval() {
         return this.extra.fn.apply(this.children)
     }
 

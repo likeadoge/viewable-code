@@ -1,6 +1,10 @@
 import { AstLeafNode } from '../base.js'
 
-export class LocalFunc extends AstLeafNode {
+export class Func extends AstLeafNode{
+
+}
+
+export class LocalFunc extends Func {
     kind = "local_func"
     extra = { name: '' }
 
@@ -16,7 +20,12 @@ export class LocalFunc extends AstLeafNode {
         return `<div>${this.extra.name}</div>`
     }
 
-    apply( argus){
+    apply(argus){
+        
+        argus.forEach(element => {
+            AstLeafNode.assert(element)
+        })
+
         const { name } = this.extra
         const _fn = LocalFunc.libs.get(name)
         if (!_fn) throw new Error(`local_fn:${name} is undefined!`)

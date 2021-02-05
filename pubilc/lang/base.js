@@ -1,3 +1,5 @@
+
+
 export class AstNode {
     kind = '(unknown)'
     extra = {}
@@ -23,11 +25,11 @@ export class AstNode {
 
 }
 
-export class AstLeafNode {
+export class AstLeafNode extends AstNode {
     isLeaf = true
 }
 
-export class AstBranchNode {
+export class AstBranchNode extends AstNode {
     isLeaf = false
     children = []
 }
