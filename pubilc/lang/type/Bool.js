@@ -5,6 +5,11 @@ import { LocalFunc } from './Func.js'
 export default class Bool extends AstLeafNode {
     kind = "num"
     extra = { n: false }
+
+    clone() {
+        return new Bool(this.extra.n)
+    }
+
     constructor(n) {
         super()
         this.extra.n = n

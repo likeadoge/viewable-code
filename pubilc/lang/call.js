@@ -1,7 +1,22 @@
 import { AstBranchNode } from './base.js'
+import { Scope } from './Scope.js'
 import { Func } from './type/Func.js'
 
-export class Call extends AstBranchNode {
+export class EvalNode extends AstBranchNode {
+    #scope = null
+
+    setScope(scope) {
+        this.#scope = scope
+    }
+
+    getScope() {
+        return this.#scope
+    }
+}
+
+
+
+export class Call extends EvalNode {
     extra = { fn: null }
     children = []
 
@@ -50,5 +65,32 @@ export class Call extends AstBranchNode {
         </div>
         `
     }
+
+    clone() {
+        return new Call(this.extra.fn, this.children.map(v => v.clone()))
+    }
 }
 
+
+export class Ref extends EvalNode {
+
+    extra = { name: '' }
+
+    constructor(name) {
+        super()
+        this.extra.name = name
+    }
+
+    eval() {
+        const scope = this.getScope()
+        Scope.assert(scope)
+        return scope.get(this.extra.name)
+    }
+
+    render() {
+        return `<div>{{${this.extra.name}}}</div>`
+    }
+    clone(){
+        return new Ref(this.extra.name)
+    }
+}

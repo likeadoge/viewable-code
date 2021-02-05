@@ -8,11 +8,12 @@ export default class Num extends AstLeafNode {
         super()
         this.extra.n = n
     }
-
+    clone() {
+        return new Num(this.extra.n)
+    }
     render() {
         return `<div class="num expr">${this.extra.n}</div>`
     }
-
     static css = {
         '.num': {
             background: 'LightSlateBlue',

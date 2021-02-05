@@ -23,13 +23,24 @@ export class AstNode {
         }
     }
 
+
+    clone(){
+        return new AstNode()
+    }
 }
 
 export class AstLeafNode extends AstNode {
     isLeaf = true
+    clone(){
+        return new AstLeafNode()
+    }
 }
 
 export class AstBranchNode extends AstNode {
     isLeaf = false
     children = []
+    
+    clone(){
+        return new AstBranchNode()
+    }
 }

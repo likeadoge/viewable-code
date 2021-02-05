@@ -1,17 +1,29 @@
-import { AstLeafNode } from '../base.js'
+import { AstLeafNode, AstBranchNode } from '../base.js'
 
-export class Func extends AstLeafNode{
+import { EvalNode } from '../call.js'
 
+import { Scope } from '../Scope.js'
+
+export class Func extends AstLeafNode {
+    regist(scope) { }
+    apply(argus) { }
 }
 
 export class LocalFunc extends Func {
     kind = "local_func"
     extra = { name: '' }
 
+    clone() {
+        return new LocalFunc(this.extra.name)
+    }
+
     constructor(name, fn) {
         super()
         this.extra.name = name
-        LocalFunc.libs.set(name, fn)
+        if (fn) {
+            LocalFunc.libs.set(name, fn)
+
+        }
     }
 
     static libs = new Map()
@@ -20,8 +32,8 @@ export class LocalFunc extends Func {
         return `<div>${this.extra.name}</div>`
     }
 
-    apply(argus){
-        
+    apply(argus) {
+
         argus.forEach(element => {
             AstLeafNode.assert(element)
         })
@@ -32,4 +44,72 @@ export class LocalFunc extends Func {
         return _fn(...argus)
     }
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+
+export class Lambda extends Func {
+    extra = {
+        argus: [],
+        body: null
+    }
+
+    #parent = null
+
+    clone() {
+        return new Lambda(this.extra.argus, this.extra.body)
+    }
+
+    constructor(argus, body) {
+        super()
+        this.extra.argus = argus
+        this.extra.body = body
+    }
+
+    regist(scope) {
+        this.#parent = scope
+    }
+
+    apply(argus) {
+        const scope = new Scope(this.scope)
+        this.extra.argus.forEach((name, index) => {
+            scope.set(name, argus[index])
+        })
+
+        const step = (node) => {
+
+            if (node instanceof EvalNode) {
+                node.setScope(scope)
+            }
+
+            if (node instanceof AstBranchNode) {
+                node.children.forEach(v => step(v))
+            }
+
+            return node
+        }
+
+        return step(this.extra.body.clone())
+    }
+
+    static css = {
+        '.expr.lambda': {
+            border: "3px dashed #333",
+            background: 'Plum'
+        }
+    }
+
+    render() {
+        return `
+    <div class="expr lambda">
+        <div class="argus">
+            ${this.extra.argus.map(v => `${v}`).join(' , ')}
+        </div>
+
+        <div class="body">
+            ${this.extra.body.render()}
+        </div>
+    </div>
+    `
+    }
+
+}
+
+

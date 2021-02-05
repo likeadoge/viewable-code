@@ -37,7 +37,6 @@ export default class Program {
 
     next() {
         this.#main = Program.next(this.#main)[1]
-        ;console.log(this.#main)
         this.render()
     }
 
