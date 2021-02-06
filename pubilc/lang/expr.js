@@ -34,10 +34,10 @@ export class Call extends AstBranchNode {
         }
     }
 
-    ;[EvalAble.key]() {
-        const [fn, ...argus] = this.children
-        return fn.apply(argus)
-    }
+        ;[EvalAble.key]() {
+            const [fn, ...argus] = this.children
+            return fn.apply(argus)
+        }
 
     render() {
         const [fn, ...argus] = this.children
@@ -72,16 +72,74 @@ export class Ref extends AstBranchNode {
 
     ;[WithContext.key] = WithContext.def()
 
-    ;[EvalAble.key]() {
-        const scope = this[WithContext.key].getScope()
-        Scope.assert(scope)
-        return scope.get(this.extra.name)
-    }
+        ;[EvalAble.key]() {
+            const scope = this[WithContext.key].getScope()
+            Scope.assert(scope)
+            return scope.get(this.extra.name)
+        }
 
     render() {
         return `<div>{{${this.extra.name}}}</div>`
     }
     clone() {
         return new Ref(this.extra.name)
+    }
+}
+
+
+
+export class Def extends AstBranchNode {
+
+
+    static css = {
+        '.expr.def': {
+            display: 'inline-block',
+            lineHeight: '32px',
+        },
+        '.expr.def>.name': {
+            background: '#666',
+            padding: '0 12px',
+            color: "#fff",
+        },
+        ".expr.def>.value": {
+            color: '#666',
+            border: '4px solid #666',
+            background: '#fff',
+        }
+    }
+
+    extra = { name: '' }
+    children = []
+
+    constructor(name, value) {
+        super()
+        this.extra.name = name
+        this.children = [value]
+    }
+
+    ;[WithContext.key] = WithContext.def()
+
+        ;[EvalAble.key]() {
+            const scope = this[WithContext.key].getScope()
+            Scope.assert(scope)
+
+            const [value] = this.children
+            scope.set(this.extra.name, value && value[EvalAble.key] ? value[EvalAble.key]() : value)
+
+            return scope.get(this.extra.name)
+        }
+
+    render() {
+        return `<div class="def expr">
+                <div class="name">
+                    ${this.extra.name}
+                </div>
+                <div class="value">
+                ${this.children[0].render()}
+                </div>
+            </div>`
+    }
+    clone() {
+        return new Ref(this.extra.name, this.children[0])
     }
 }

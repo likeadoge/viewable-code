@@ -2,7 +2,7 @@ import { Program, types, expr } from './lang/index.js'
 
 
 const { Num, Bool, Lambda } = types
-const { Call, Ref } = expr
+const { Call, Ref, Def } = expr
 
 const add = (a, b) => new Call(Num.add, [a, b])
 const sub = (a, b) => new Call(Num.sub, [a, b])
@@ -18,6 +18,7 @@ const num = (n) => new Num(n)
 const _f = () => new Bool(false)
 const _t = () => new Bool(true)
 const ref = (name) => new Ref(name)
+const def = (name) => (value) => new Def(name, value)
 
 const lambda = (...argus) => body => new Lambda(argus, body)
 const apply = (fn) => (...argus) => new Call(fn, argus)
@@ -27,11 +28,11 @@ const program = new Program(
     cond(and(_f(), or(_t(), _f())),
 
 
-        add(num(1), num(3)),
+        def('val')(add(num(1), num(3))),
         sub(
             apply(
                 lambda('a', 'b')(mul(ref('a'), num(3)))
-            )(add(num(8),num(2)), num(2)),
+            )(add(num(8),ref('val')), num(2)),
             num(2)
         )
     )

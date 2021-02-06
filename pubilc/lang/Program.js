@@ -1,11 +1,11 @@
 import { Num, Bool } from './type/index.js'
-import { Call } from './expr.js'
+import { Call,Ref } from './expr.js'
 import { AstNode, AstLeafNode, AstBranchNode } from './base.js'
 import { EvalAble } from './interface.js'
 
 console.log(Call.css)
 
-const css = [AstNode, Num, Call, Bool]
+const css = [AstNode, Num, Call, Bool,Ref]
     .map(v => v.css)
     .flatMap(v => Object.entries(v))
     .map(([sel, values]) => `
