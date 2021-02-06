@@ -17,14 +17,13 @@ export class EvalNode extends AstBranchNode {
 
 
 export class Call extends EvalNode {
-    extra = { fn: null }
+
     children = []
 
     constructor(fn, children) {
         super()
         Func.assert(fn)
-        this.extra.fn = fn
-        this.children = children
+        this.children = [fn,...children]
     }
 
     static css = {
@@ -49,25 +48,28 @@ export class Call extends EvalNode {
     }
 
     eval() {
-        return this.extra.fn.apply(this.children)
+        const [fn,...argus] = this.children
+        return fn.apply(argus)
     }
 
     render() {
+        const [fn,...argus] = this.children
         return `
         <div class="call expr" id="${this.eid}">
             <div class="fn" title="双击执行" ondblclick="fnEval('${this.eid}')">
-            ${this.extra.fn.render()}
+            ${fn.render()}
             </div>
         
             <div>
-            ${this.children.map(v => v.render()).join('')}
+            ${argus.map(v => v.render()).join('')}
             </div>
         </div>
         `
     }
 
     clone() {
-        return new Call(this.extra.fn, this.children.map(v => v.clone()))
+        const [fn,...argus] = this.children
+        return new Call(fn,argus)
     }
 }
 
