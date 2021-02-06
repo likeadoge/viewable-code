@@ -1,5 +1,3 @@
-import { Num, LocalFunc } from './type/index.js'
-
 export class Scope {
     static runtime = new Scope()
     static globe = new Scope(Scope.runtime)
@@ -35,15 +33,5 @@ export class Scope {
         )
     }
 }
-
-// Scope.runtime.set('+', new LocalFunc('+',(a, b) => Num.add(a, b)))
-// Scope.runtime.set('-', new LocalFunc('-',(a, b) => Num.sub(a, b)))
-// Scope.runtime.set('*', new LocalFunc('*',(a, b) => Num.mul(a, b)))
-// Scope.runtime.set('/', new LocalFunc('/',(a, b) => Num.div(a, b)))
-// Scope.runtime.set('&&', new LocalFunc('&&',(a, b) => Bool.and(a, b)))
-// Scope.runtime.set('||', new LocalFunc('||',(a, b) => Bool.or(a, b)))
-// Scope.runtime.set('!not', new LocalFunc('!not',(a) => Bool.not(a)))
-// Scope.runtime.set('log', new LocalFunc('log',(a) => (console.log(a), a)))
-// Scope.runtime.set('lines', new LocalFunc('lines',(...argus) => argus.reduce((a, b) => b)))
 
 
