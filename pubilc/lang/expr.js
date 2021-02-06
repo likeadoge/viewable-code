@@ -1,29 +1,16 @@
 import { AstBranchNode } from './base.js'
 import { Scope } from './Scope.js'
 import { Func } from './type/Func.js'
+import { EvalAble, WithContext } from './interface.js'
 
-export class EvalNode extends AstBranchNode {
-    #scope = null
-
-    setScope(scope) {
-        this.#scope = scope
-    }
-
-    getScope() {
-        return this.#scope
-    }
-}
-
-
-
-export class Call extends EvalNode {
+export class Call extends AstBranchNode {
 
     children = []
 
     constructor(fn, children) {
         super()
         Func.assert(fn)
-        this.children = [fn,...children]
+        this.children = [fn, ...children]
     }
 
     static css = {
@@ -47,13 +34,13 @@ export class Call extends EvalNode {
         }
     }
 
-    eval() {
-        const [fn,...argus] = this.children
+    ;[EvalAble.key]() {
+        const [fn, ...argus] = this.children
         return fn.apply(argus)
     }
 
     render() {
-        const [fn,...argus] = this.children
+        const [fn, ...argus] = this.children
         return `
         <div class="call expr" id="${this.eid}">
             <div class="fn" title="双击执行" ondblclick="fnEval('${this.eid}')">
@@ -68,13 +55,13 @@ export class Call extends EvalNode {
     }
 
     clone() {
-        const [fn,...argus] = this.children
-        return new Call(fn,argus)
+        const [fn, ...argus] = this.children
+        return new Call(fn, argus)
     }
 }
 
 
-export class Ref extends EvalNode {
+export class Ref extends AstBranchNode {
 
     extra = { name: '' }
 
@@ -83,8 +70,10 @@ export class Ref extends EvalNode {
         this.extra.name = name
     }
 
-    eval() {
-        const scope = this.getScope()
+    ;[WithContext.key] = WithContext.def()
+
+    ;[EvalAble.key]() {
+        const scope = this[WithContext.key].getScope()
         Scope.assert(scope)
         return scope.get(this.extra.name)
     }
@@ -92,7 +81,7 @@ export class Ref extends EvalNode {
     render() {
         return `<div>{{${this.extra.name}}}</div>`
     }
-    clone(){
+    clone() {
         return new Ref(this.extra.name)
     }
 }

@@ -1,8 +1,6 @@
 import { AstLeafNode, AstBranchNode } from '../base.js'
-
-import { EvalNode } from '../call.js'
-
 import { Scope } from '../Scope.js'
+import { WithContext } from '../interface.js'
 
 export class Func extends AstLeafNode {
     regist(scope) { }
@@ -51,7 +49,7 @@ export class Lambda extends Func {
         body: null
     }
 
-    #parent = null
+        ;[WithContext.key] = WithContext.def()
 
     clone() {
         return new Lambda(this.extra.argus, this.extra.body)
@@ -63,20 +61,16 @@ export class Lambda extends Func {
         this.extra.body = body
     }
 
-    regist(scope) {
-        this.#parent = scope
-    }
-
     apply(argus) {
-        const scope = new Scope(this.scope)
+        const scope = new Scope(this[WithContext.key].getScope())
         this.extra.argus.forEach((name, index) => {
             scope.set(name, argus[index])
         })
 
         const step = (node) => {
 
-            if (node instanceof EvalNode) {
-                node.setScope(scope)
+            if (node[WithContext.key]) {
+                node[WithContext.key].init(scope)
             }
 
             if (node instanceof AstBranchNode) {

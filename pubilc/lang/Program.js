@@ -1,8 +1,11 @@
-import { Num,Bool } from './type/index.js'
-import { Call } from './call.js'
+import { Num, Bool } from './type/index.js'
+import { Call } from './expr.js'
 import { AstNode, AstLeafNode, AstBranchNode } from './base.js'
+import { EvalAble } from './interface.js'
 
-const css = [AstNode, Num, Call,Bool]
+console.log(Call.css)
+
+const css = [AstNode, Num, Call, Bool]
     .map(v => v.css)
     .flatMap(v => Object.entries(v))
     .map(([sel, values]) => `
@@ -60,7 +63,7 @@ export default class Program {
                 return [true, node]
             } else {
 
-                return [true, node.eval()]
+                return [true, node[EvalAble.key]()]
             }
         }
 

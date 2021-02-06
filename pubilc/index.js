@@ -1,8 +1,8 @@
-import { Program, types, call } from './lang/index.js'
+import { Program, types, expr } from './lang/index.js'
 
 
 const { Num, Bool, Lambda } = types
-const { Call, Ref } = call
+const { Call, Ref } = expr
 
 const add = (a, b) => new Call(Num.add, [a, b])
 const sub = (a, b) => new Call(Num.sub, [a, b])
