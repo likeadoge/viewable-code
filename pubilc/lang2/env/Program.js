@@ -1,72 +1,52 @@
-import { Num, Bool } from './type/index.js'
-import { Call,Ref } from './expr.js'
-import { AstNode, AstLeafNode, AstBranchNode } from './base.js'
-import { EvalAble } from './interface.js'
+import { Value, Call } from '../ast/value.js'
 
-console.log(Call.css)
-
-const css = [AstNode, Num, Call, Bool,Ref]
-    .map(v => v.css)
-    .flatMap(v => Object.entries(v))
-    .map(([sel, values]) => `
-        ${sel}{
-            ${Object.entries(values)
-            .map(([key, value]) => `${key.split('').map(v => v.toLocaleLowerCase() === v ? v : ('-' + v.toLocaleLowerCase())).join('')}:${value};`)
-            .join('\n')}
-        }
-    `)
-    .join(``)
-
-const style = document.createElement('style')
-style.innerHTML = css
-document.body.appendChild(style)
-
-export default class Program {
-
-    #el = null
-
-    #main = null
-
-    constructor(main) {
-        this.#main = main
-        this.#el = document.getElementById('app') || document.createElement('div')
-        this.#el.id = 'app'
-        document.body.appendChild(this.#el)
+export class Program {
+    source = null
+    #current = null
+    constructor(input) {
+        const { source } = input
+        this.source = source.clone()
+        this.#current = source.clone()
     }
 
-    render() {
-        this.#el.innerHTML = this.#main.render()
+    #eval(call) {
+        const fn = call.fn()
+        const argus = call.argus()
+        return fn.apply(argus)
     }
 
-    next() {
-        this.#main = Program.next(this.#main)[1]
-        this.render()
-    }
+    nextStep() {
+        const recur = (node) => {
+            if (node instanceof Value) {
+                return [node.clone(), false]
+            } else if (node instanceof Call) {
+                const fn = node.fn()
+                const argus = node.argus()
 
-    static next(node) {
-        if (node instanceof AstLeafNode)
-            return [false, node]
-        if (node instanceof AstBranchNode) {
-            const { children } = node
-            const [done, nextChildren] = children.reduce((r, v) => {
-                const [done, above] = r
-                if (done) {
-                    return [done, above.concat([v])]
+                const [newargus, status] = argus.reduce((res, v) => {
+                    const [arr, status] = res
+                    if (status) {
+                        return [arr.concat([v]), true]
+                    }else {
+                        const [n, s] = recur(v)
+                        return [arr.concat([n]), s]
+                    }
+                }, [[], false])
+
+                if (status) {
+                    const n = node.clone().setChildren([fn, ...newargus])
+                    return [n, true]
                 } else {
-                    const [done, next] = Program.next(v)
-                    return [done, above.concat([next])]
+                    const n = node.clone().setChildren([fn, ...newargus])
+                    return [this.#eval(n), true]
                 }
-            }, [false, []])
-
-            if (done) {
-                node.children = nextChildren
-                return [true, node]
-            } else {
-
-                return [true, node[EvalAble.key]()]
             }
         }
 
-    }
+        const [n] = recur(this.#current)
 
+        this.#current = n
+
+        return this
+    }
 }

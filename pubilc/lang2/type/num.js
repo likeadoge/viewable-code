@@ -46,4 +46,8 @@ export class Num extends Value {
     }
 }
 
+
+
+
+
 AbsNode.regist(Num)

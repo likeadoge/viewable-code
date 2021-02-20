@@ -9,11 +9,21 @@ export class Call extends AbsBranch {
         )
     }
 
+    fn(){
+        const [fn,...argus] = this.getChildren()
+        return fn
+    }
+    argus(){
+        const [fn,...argus] = this.getChildren()
+        return argus
+    }
+    
     static fromJsonObj(obj) {
         const call = super.fromJsonObj(obj)
         call.setChildren(obj.children.map(v => AbsNode.prase(v)))
         return call
     }
+
 
     toJsonObj() {
         return {
