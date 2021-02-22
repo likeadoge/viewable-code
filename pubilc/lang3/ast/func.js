@@ -3,7 +3,7 @@ import { runtime } from '../env/runtime.js'
 
 export class SymLocalFunc extends Sym {
 
-    static gen(v){return new SymLocalFunc().set(v)}
+    static gen(v) { return new SymLocalFunc().set(v) }
 
     #name = ''
 
@@ -31,3 +31,5 @@ export class SymLocalFunc extends Sym {
         return new SymLocalFunc().set(this.#name)
     }
 }
+
+
