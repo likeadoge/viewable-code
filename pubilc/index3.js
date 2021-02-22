@@ -1,11 +1,11 @@
-import { ast } from './lang3/index.js'
+import { ast, Program } from './lang3/index.js'
 
-const { Call, SymNum ,SymLocalFunc} = ast
+const { SymCall: SymCall, SymNum, SymLocalFunc } = ast
 
 const test = [
     () => {
 
-        const call = new Call()
+        const call = new SymCall()
             .setComment('this is call')
             .setList([
                 SymLocalFunc.gen('num:add').setComment('this is function'),
@@ -17,11 +17,9 @@ const test = [
         console.log(call)
 
     },
-
-    
     () => {
 
-        const call = new Call()
+        const call = new SymCall()
             .setComment('this is call')
             .setList([
                 SymLocalFunc.gen('num:add').setComment('this is function'),
@@ -33,6 +31,25 @@ const test = [
 
         console.log(call)
 
+    },
+    () => {
+        const source = new SymCall()
+            .setComment('this is call')
+            .setList([
+                SymLocalFunc.gen('num:add').setComment('this is function'),
+                SymNum.gen(2).setComment('this is argument0'), 
+                new SymCall()
+                    .setComment('this is call')
+                    .setList([
+                        SymLocalFunc.gen('num:add').setComment('this is function'),
+                        SymNum.gen(2).setComment('this is argument0'),
+                        SymNum.gen(3).setComment('this is argument1'),
+                    ])
+            ])
+
+        const program = new Program({ source })
+        console.log(program)
+        window.next = () => console.log(program.nextStep())
     }
 ]
 

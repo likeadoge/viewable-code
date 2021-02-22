@@ -1,6 +1,4 @@
-export {Node,Sym,List} from './base.js'
-
-export {Call} from './call.js'
+export {Node,SymCall,SymValue} from './base.js'
 
 export {SymLocalFunc} from './func.js'
 

@@ -1,7 +1,7 @@
-import { Sym } from './base.js'
+import { SymValue } from './base.js'
 import { ValNum } from '../val/num.js'
 
-export class SymNum extends Sym {
+export class SymNum extends SymValue {
     #val = 0
 
     static gen(v){
