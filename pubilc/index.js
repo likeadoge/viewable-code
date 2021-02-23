@@ -1,4 +1,4 @@
-import { ast, Program } from './lang3/index.js'
+import { ast, Program } from './lang/index.js'
 
 const { SymCall: SymCall, SymNum, SymLocalFunc, SymDefine, SymRefer, SymLambda } = ast
 
