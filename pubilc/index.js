@@ -1,6 +1,6 @@
 import { ast, Program } from './lang/index.js'
 
-const { SymCall: SymCall, SymNum, SymLocalFunc, SymDefine, SymRefer, SymLambda } = ast
+const { SymCall: SymCall, SymNum, SymLocalFunc, SymDefine, SymRefer, SymLambda, SymBool } = ast
 
 const test = [
     () => {
@@ -130,6 +130,30 @@ const test = [
         const program = new Program({ source })
         console.log(program)
         window.next2 = () => console.log(program.nextStep())
+    },
+    () => {
+
+        const source = new SymCall()
+            .setComment('this is call')
+            .setList([
+                SymLocalFunc.gen('bool:cond').setComment('this is function'),
+
+                new SymCall()
+                    .setComment('this is call')
+                    .setList([
+                        SymLocalFunc.gen('bool:or').setComment('this is function'),
+                        SymBool.gen(false),
+                        SymBool.gen(true),
+                    ]),
+                    
+                SymNum.gen(1).setComment('this is argument0'),
+                
+                SymNum.gen(0).setComment('this is argument0')
+            ])
+
+        const program = new Program({ source })
+        console.log(program)
+        window.next3 = () => console.log(program.nextStep())
     }
 ]
 

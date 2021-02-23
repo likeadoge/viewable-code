@@ -1,6 +1,4 @@
 import { Value } from './base.js'
-import { runtime } from '../env/runtime.js'
-import { ValFunc } from './func.js'
 
 export class ValNum extends Value {
 
@@ -20,9 +18,3 @@ export class ValNum extends Value {
 
     log() { return `${this.#v}` }
 }
-
-
-runtime.set('num:add', new ValFunc((a, b) => ValNum.add(a, b)))
-runtime.set('num:sub', new ValFunc((a, b) => ValNum.sub(a, b)))
-runtime.set('num:mul', new ValFunc((a, b) => ValNum.mul(a, b)))
-runtime.set('num:div', new ValFunc((a, b) => ValNum.div(a, b)))
