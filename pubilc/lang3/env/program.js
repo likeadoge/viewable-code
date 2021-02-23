@@ -15,7 +15,7 @@ export class Program {
             if (node instanceof Value) {
                 return [node, false]
             } else if (node instanceof SymValue) {
-                return [node.val(), true]
+                return [node.debugger(), true]
             } else if (node instanceof SymCall) {
                 const argus = node.getArgus()
 
@@ -34,7 +34,7 @@ export class Program {
                     return [n, true]
                 } else {
                     const n = node.clone().setArgus(newargus)
-                    return [n.val(), true]
+                    return [n.debugger(), true]
                 }
             } else {
                 console.error(node)

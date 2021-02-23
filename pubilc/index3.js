@@ -1,6 +1,6 @@
 import { ast, Program } from './lang3/index.js'
 
-const { SymCall: SymCall, SymNum, SymLocalFunc, SymDefine, SymRefer } = ast
+const { SymCall: SymCall, SymNum, SymLocalFunc, SymDefine, SymRefer, SymLambda } = ast
 
 const test = [
     () => {
@@ -84,6 +84,52 @@ const test = [
         const program = new Program({ source })
         console.log(program)
         window.next1 = () => console.log(program.nextStep())
+    },
+    () => {
+        const source = new SymCall()
+            .setFn(SymLocalFunc.gen('sys:lines'))
+            .setArgus([
+                new SymCall()
+                    .setFn(SymDefine.gen('foo'))
+                    .setArgus([
+                        SymLambda.gen(['a', 'b', 'c'],
+                            new SymCall()
+                                .setFn(SymLocalFunc.gen('num:mul'))
+                                .setArgus([
+                                    SymRefer.gen('a'),
+                                    new SymCall()
+                                        .setFn(SymLocalFunc.gen('num:mul'))
+                                        .setArgus([
+                                            SymRefer.gen('b'),
+                                            SymRefer.gen('c')
+                                        ])
+                                ])
+                        )
+                    ]),
+
+                new SymCall()
+                    .setFn(SymLocalFunc.gen('num:add'))
+                    .setArgus([
+                        new SymCall()
+                            .setFn(SymRefer.gen('foo'))
+                            .setArgus([
+                                SymNum.gen(2).setComment('this is argument0'),
+                                SymNum.gen(3).setComment('this is argument1'),
+                                SymNum.gen(4).setComment('this is argument1')
+                            ]),
+                        new SymCall()
+                            .setFn(
+                                SymLocalFunc.gen('num:add').setComment('this is function'))
+                            .setArgus([
+                                SymNum.gen(2).setComment('this is argument0'),
+                                SymNum.gen(3).setComment('this is argument1')
+                            ])
+                    ])
+            ])
+
+        const program = new Program({ source })
+        console.log(program)
+        window.next2 = () => console.log(program.nextStep())
     }
 ]
 

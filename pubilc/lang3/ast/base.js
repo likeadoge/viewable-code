@@ -15,12 +15,12 @@ export class Node {
         return this.#comment
     }
 
-    setScope(s){
+    setScope(s) {
         this.#scope = s
         return this
     }
 
-    getScope(){
+    getScope() {
         return this.#scope
     }
 
@@ -28,6 +28,10 @@ export class Node {
 
 
     val() { throw_abs_error(`Sym:val`) }
+
+    debugger() {
+        return this.val()
+    }
 
     clone() {
         const { constructor } = Object.getPrototypeOf(this)
@@ -65,6 +69,15 @@ export class SymCall extends List {
     }
 
     val() {
+        const [fn, ...argus] = this.getList()
+        const valfn = fn instanceof Value ? fn : fn.val()
+
+        const s = valfn.apply(argus.map(v => v instanceof Value ? v : v.val()))
+
+        return s instanceof Node ? s.val() : s
+    }
+
+    debugger() {
         const [fn, ...argus] = this.getList()
         const valfn = fn instanceof Value ? fn : fn.val()
 
