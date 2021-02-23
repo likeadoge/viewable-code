@@ -1,5 +1,4 @@
 import { SymValue } from './base.js'
-import { Scope } from '../env/scope.js'
 import { ValFunc } from '../val/index.js'
 
 
@@ -28,11 +27,11 @@ export class SymRefer extends SymValue {
     }
 
     val() {
-        return Scope.globe.get(this.#name)
+        return this.getScope().get(this.#name)
     }
 
     clone() {
-        return new SymRefer().set(this.#name)
+        return super.clone().set(this.#name)
     }
 }
 
@@ -61,12 +60,12 @@ export class SymDefine extends SymValue {
 
     val() {
         return new ValFunc(v => {
-            Scope.globe.set(this.#name, v)
+            this.getScope().set(this.#name, v)
             return v
         })
     }
 
     clone() {
-        return new SymDefine().set(this.#name)
+        return super.clone().set(this.#name)
     }
 }

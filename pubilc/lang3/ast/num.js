@@ -29,6 +29,6 @@ export class SymNum extends SymValue {
     }
 
     clone() {
-        return new SymNum().set(this.#val)
+        return super.clone().set(this.#val)
     }
 }

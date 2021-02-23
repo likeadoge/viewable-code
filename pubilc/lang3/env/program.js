@@ -12,10 +12,9 @@ export class Program {
 
     nextStep() {
         const recur = (node) => {
-            if (node instanceof Value){
-                return [node,false]
-            }
-            if (node instanceof SymValue) {
+            if (node instanceof Value) {
+                return [node, false]
+            } else if (node instanceof SymValue) {
                 return [node.val(), true]
             } else if (node instanceof SymCall) {
                 const argus = node.getArgus()
@@ -37,6 +36,9 @@ export class Program {
                     const n = node.clone().setArgus(newargus)
                     return [n.val(), true]
                 }
+            } else {
+                console.error(node)
+                throw new Error('recur type error')
             }
         }
 

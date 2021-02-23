@@ -28,7 +28,7 @@ export class SymLocalFunc extends Sym {
     }
 
     clone() {
-        return new SymLocalFunc().set(this.#name)
+        return super.clone().set(this.#name)
     }
 }
 

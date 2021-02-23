@@ -1,8 +1,10 @@
 import { throw_abs_error } from '../../utils/error.js'
 import { Value } from '../val/index.js'
+import { Scope } from '../env/scope.js'
 
 export class Node {
     #comment = ''
+    #scope = Scope.globe
 
     setComment(s) {
         this.#comment = s
@@ -13,12 +15,25 @@ export class Node {
         return this.#comment
     }
 
+    setScope(s){
+        this.#scope = s
+        return this
+    }
+
+    getScope(){
+        return this.#scope
+    }
+
     toJsonObj() { throw_abs_error(`Node:toJsonObj`) }
 
 
     val() { throw_abs_error(`Sym:val`) }
 
-    clone() { throw_abs_error(`Node:clone`) }
+    clone() {
+        const { constructor } = Object.getPrototypeOf(this)
+
+        return new constructor().setComment(this.#comment)
+    }
 }
 
 export class Sym extends Node {
@@ -40,6 +55,8 @@ export class SymValue extends Sym {
 
 
 export class SymCall extends List {
+
+
     toJsonObj() {
         return {
             type: 'call',
@@ -77,7 +94,7 @@ export class SymCall extends List {
     }
 
     clone() {
-        return new SymCall().setList(this.getList().map(v => v instanceof Node ? v.clone() : v))
+        return super.clone().setList(this.getList().map(v => v instanceof Node ? v.clone() : v))
     }
 }
 
