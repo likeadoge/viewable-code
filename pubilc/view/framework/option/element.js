@@ -1,12 +1,16 @@
 import { styl, StyleOption } from './style.js'
 import { AttrOption, attr } from './attr.js'
+import { even, EventOption } from './event.js'
 import { get } from './base.js'
 
 export class HtmlElementOpiton {
     tag = ``
     html = ``
+    type = ``
     children = new HtmlElementGroup()
     style = new StyleOption()
+    attr = new AttrOption()
+    event = new EventOption()
 }
 
 export class HtmlElementGroup {
@@ -19,8 +23,10 @@ export const html = (el = new HtmlElementGroup) => new Proxy(el, {
             ? group
             : (...options) => {
                 const element = new HtmlElementOpiton()
-                
-                element.tag = name
+
+                const list = name.split('_')
+                element.tag = list[0] || ''
+                element.type = list[1] || ''
 
                 options.forEach(v => {
                     if (typeof v === 'string') element.html = v
@@ -29,6 +35,7 @@ export const html = (el = new HtmlElementGroup) => new Proxy(el, {
 
                         if (s instanceof StyleOption) element.style = s
                         if (s instanceof AttrOption) element.attr = s
+                        if (s instanceof EventOption) element.event = s
                         if (s instanceof HtmlElementGroup) element.children = s
                     }
 
@@ -47,8 +54,9 @@ export const node = input => html()
             .background_color('yellow'),
         attr.title('this is head!')
             .class('name'),
+        even.click(() => alert(`click!`)),
         html.div()
-            .span(`name`)
+            .span(`name`),
     )
     .div_body()
 

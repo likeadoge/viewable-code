@@ -1,6 +1,6 @@
 import { get } from './base.js'
 
-export class AttrOption {
+export class EventOption {
     #map = new Map()
 
     set(name, value) {
@@ -16,9 +16,9 @@ export class AttrOption {
     }
 }
 
-export const attr = (c = new AttrOption()) => new Proxy(c, {
+export const even = (c = new EventOption()) => new Proxy(c, {
     get: (option, name) => (value) =>
         name === get ?
             option :
-            attr(option.set(name, value))
+            even(option.set(name, value))
 })
