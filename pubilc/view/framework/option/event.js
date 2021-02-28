@@ -8,17 +8,16 @@ export class EventOption {
         return this
     }
 
-    apply(dom){
+    apply(dom) {
         const list = Array.from(this.#map.entries())
-        list.forEach(([name,val])=>{
+        list.forEach(([name, val]) => {
             dom[name] = val
         })
     }
 }
 
 export const even = (c = new EventOption()) => new Proxy(c, {
-    get: (option, name) => (value) =>
-        name === get ?
-            option :
-            even(option.set(name, value))
+    get: (option, name) => name === get
+        ? option
+        : (value) =>even(option.set(name, value))
 })

@@ -29,7 +29,8 @@ export const html = (el = new HtmlElementGroup) => new Proxy(el, {
                 element.type = list[1] || ''
 
                 options.forEach(v => {
-                    if (typeof v === 'string') element.html = v
+                    if (typeof v === 'string') 
+                        element.html = v
                     if (v[get]) {
                         const s = v[get]
 

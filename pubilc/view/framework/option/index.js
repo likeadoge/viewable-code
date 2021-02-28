@@ -1,4 +1,4 @@
 export { get } from './base.js'
-export { styl } from './style.js'
-export { html } from './element.js'
-export { attr } from './attr.js'
+export { styl, StyleOption } from './style.js'
+export { html, HtmlElementGroup, HtmlElementOpiton } from './element.js'
+export { attr, AttrOption } from './attr.js'
