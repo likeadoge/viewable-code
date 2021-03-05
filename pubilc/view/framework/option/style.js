@@ -5,7 +5,7 @@ export class StyleOption {
 
     set(name, value) {
         const v = name.split('')
-            .map((v, i ,arr) => arr[i - 1] && (arr[i - 1] === '_')
+            .map((v, i, arr) => arr[i - 1] && (arr[i - 1] === '_')
                 ? v.toLocaleUpperCase()
                 : v)
             .filter(v => v !== '_')

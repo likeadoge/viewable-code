@@ -49,15 +49,4 @@ export const html = (el = new HtmlElementGroup) => new Proxy(el, {
 })
 
 
-export const node = input => html()
-    .div_header(
-        styl.color('red')
-            .background_color('yellow'),
-        attr.title('this is head!')
-            .class('name'),
-        even.click(() => alert(`click!`)),
-        html.div()
-            .span(`name`),
-    )
-    .div_body()
 

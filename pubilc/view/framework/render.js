@@ -1,6 +1,5 @@
-import { EventOption } from './option/event.js'
 import {
-    AttrOption, StyleOption, HtmlElementGroup, HtmlElementOpiton
+    AttrOption, StyleOption,EventOption, HtmlElementGroup, HtmlElementOpiton
 } from './option/index.js'
 
 export const render = (group, cntr = document.createElement('div')) => {
@@ -15,6 +14,12 @@ export const render = (group, cntr = document.createElement('div')) => {
                     style.apply(dom)
                 } else
                     throw new Error('style render error!')
+
+                    
+                if (event instanceof EventOption) {
+                    event.apply(dom)
+                } else
+                    throw new Error('event render error!')
 
 
                 if (attr instanceof AttrOption) {

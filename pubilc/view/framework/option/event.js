@@ -4,14 +4,22 @@ export class EventOption {
     #map = new Map()
 
     set(name, value) {
-        this.#map.set(name, value)
+
+        const v = name.split('')
+        // .map((v, i ,arr) => arr[i - 1] && (arr[i - 1] === '_')
+        //     ? v.toLocaleUpperCase()
+        //     : v)
+        .filter(v => v !== '_')
+        .join('')
+
+        this.#map.set(v, value)
         return this
     }
 
     apply(dom) {
         const list = Array.from(this.#map.entries())
         list.forEach(([name, val]) => {
-            dom[name] = val
+            dom.addEventListener(name,(e) => val(dom, e))
         })
     }
 }

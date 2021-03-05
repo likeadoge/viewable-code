@@ -4,7 +4,15 @@ export class AttrOption {
     #map = new Map()
 
     set(name, value) {
-        this.#map.set(name, value)
+
+        const v = name.split('')
+        .map((v, i ,arr) => arr[i - 1] && (arr[i - 1] === '_')
+            ? v.toLocaleUpperCase()
+            : v)
+        .filter(v => v !== '_')
+        .join('')
+
+        this.#map.set(v, value)
         return this
     }
 
