@@ -13,9 +13,11 @@ export class Reactable {
     val() { return this.#val }
 
 
-    constructor(list) {
+    constructor(list, transform) {
         this.#target = list
+        this.#transform = transform
         this.#target.forEach(v => v instanceof Reactable ? v.listen(this.#emitter) : null)
+        this.#val = this.#transform(...this.#target.map(v => v instanceof Reactable ? v.val() : v))
     }
 
     #update() {
@@ -28,13 +30,24 @@ export class Reactable {
         }
     }
 
+    modify(fn = v => v) {
+        this.#target = this.#target.map((v, i) => fn(v, i))
+        this.#update()
+        return this
+    }
+
+    modifyArray(fn = (...arg) => arg) {
+        this.#target = fn(...this.#target)
+        this.#update()
+        return this
+    }
+
     listen(emitter) {
         this.#emitters.push(emitter)
     }
 }
-
 export class Emitter {
-    constructor(cb){this.#cb = cb}
+    constructor(cb) { this.#cb = cb }
     #cb = () => { }
     emit() { this.#cb() }
-}
+} 

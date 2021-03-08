@@ -1,5 +1,9 @@
 import { html, attr, styl, even, get } from './option/index.js'
 import { render } from './render.js'
+import { Reactable } from './reactive/reactable.js'
+
+const title = new Reactable(['title!'], v => v)
+
 
 const op = html()
     .div(
@@ -7,11 +11,13 @@ const op = html()
             .color('red')
             .background_color('yellow'),
         attr()
-            .title('this is head!')
+            .title(title)
             .class('name'),
         even()
             .mouse_enter((dom) => { dom.style.backgroundColor = '#66ccff' })
-            .mouse_leave((dom) => { dom.style.backgroundColor = 'yellow' }),
+            .mouse_leave((dom) => { dom.style.backgroundColor = 'yellow' })
+            .click(() => title.modify(v => v + '!'))
+        ,
         html()
             .div()
             .span(
