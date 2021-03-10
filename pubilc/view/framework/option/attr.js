@@ -1,5 +1,5 @@
 import { get } from './base.js'
-import { Reactable, Emitter } from '../reactive/reactable.js'
+import { ReactZone, Emitter } from '../reactive/index.js'
 
 export class AttrOption {
     #map = new Map()
@@ -17,7 +17,7 @@ export class AttrOption {
 
         this.#map.set(key, value)
 
-        if (value instanceof Reactable) {
+        if (value instanceof ReactZone) {
             const emitter = new Emitter(() => {
                 this.#domList.forEach(dom => this.#use(dom))
             })
@@ -31,7 +31,7 @@ export class AttrOption {
     #use(dom) {
         const list = Array.from(this.#map.entries())
         list.forEach(([name, val]) => {
-            dom[name] = val instanceof Reactable ? val.val() : val
+            dom[name] = val instanceof ReactZone ? val.val() : val
         })
     }
 

@@ -1,4 +1,4 @@
-export class Reactable {
+export class ReactZone {
 
     #val = null
 
@@ -6,7 +6,7 @@ export class Reactable {
 
     #emitters = []
 
-    #emitter = new Emitter(() => this.#update)
+    #emitter = new Emitter(() => this.#update())
 
     #transform = () => { }
 
@@ -16,12 +16,13 @@ export class Reactable {
     constructor(list, transform) {
         this.#target = list
         this.#transform = transform
-        this.#target.forEach(v => v instanceof Reactable ? v.listen(this.#emitter) : null)
-        this.#val = this.#transform(...this.#target.map(v => v instanceof Reactable ? v.val() : v))
+        this.#target.forEach(v => v instanceof ReactZone ? v.listen(this.#emitter) : null)
+        this.#val = this.#transform(...this.#target.map(v => v instanceof ReactZone ? v.val() : v))
     }
 
     #update() {
-        const newVal = this.#transform(...this.#target.map(v => v instanceof Reactable ? v.val() : v))
+        debugger
+        const newVal = this.#transform(...this.#target.map(v => v instanceof ReactZone ? v.val() : v))
         if ((!newVal instanceof Object || newVal === null) && newVal === this.val) {
             return
         } else {
@@ -45,9 +46,20 @@ export class Reactable {
     listen(emitter) {
         this.#emitters.push(emitter)
     }
+
+    map(fn) {
+        return new ReactZone([this], fn)
+    }
 }
+
+export const rZone = (...args) => new ReactZone(args, v => v)
+
+export const rZlist = (...args) => new ReactZone(args, (...v) => v)
+
+
+
 export class Emitter {
     constructor(cb) { this.#cb = cb }
     #cb = () => { }
     emit() { this.#cb() }
-} 
+}
