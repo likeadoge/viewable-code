@@ -21,7 +21,6 @@ export class ReactZone {
     }
 
     #update() {
-        debugger
         const newVal = this.#transform(...this.#target.map(v => v instanceof ReactZone ? v.val() : v))
         if ((!newVal instanceof Object || newVal === null) && newVal === this.val) {
             return

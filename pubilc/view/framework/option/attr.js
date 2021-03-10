@@ -24,7 +24,6 @@ export class AttrOption {
             value.listen(emitter)
         }
 
-        this.#map.set(key, value)
         return this
     }
 

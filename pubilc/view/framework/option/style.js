@@ -1,7 +1,9 @@
 import { get } from './base.js'
+import { ReactZone, Emitter } from '../reactive/index.js'
 
 export class StyleOption {
     #map = new Map()
+    #domList = []
 
     set(name, value) {
         const v = name.split('')
@@ -11,15 +13,28 @@ export class StyleOption {
             .filter(v => v !== '_')
             .join('')
         this.#map.set(v, value)
+
+        
+        if (value instanceof ReactZone) {
+            const emitter = new Emitter(() => {
+                this.#domList.forEach(dom => this.#use(dom))
+            })
+            value.listen(emitter)
+        }
+
         return this
     }
 
-    apply(dom) {
-
+    #use(dom) {
         const list = Array.from(this.#map.entries())
         list.forEach(([name, val]) => {
-            dom.style[name] = val
+            dom.style[name] = val instanceof ReactZone ? val.val() : val
         })
+    }
+
+    apply(dom) {
+        this.#domList = this.#domList.filter(v => v === dom).concat([dom])
+        this.#use(dom)
     }
 }
 
