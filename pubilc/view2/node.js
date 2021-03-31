@@ -1,7 +1,7 @@
 import { ReactZone, Watcher } from './reactive.js'
 
 
-export class Reactable {
+export class _Reactable {
     emiter = new Watcher(() => this.update())
 
     #updateEvent = null
@@ -16,13 +16,15 @@ export class Reactable {
 
 }
 
-export class RText extends Reactable {
+export class RText extends _Reactable {
     #text = null
+
     setText(val) {
         if (val instanceof ReactZone) {
             val.addWatcher(this.emiter)
         }
         this.#text = val
+        return this
     }
     getText() {
         return (
@@ -33,28 +35,32 @@ export class RText extends Reactable {
     }
 }
 
-export class ROption extends Reactable {
-    #map = new Map
+export class ROption extends _Reactable {
+    #map = new Map()
     each(cb) {
-        for (const [name, value] of this.#map.entries()) {
-            cb(name, value instanceof ReactZone ? value.val() : value)
-        }
+        Array.from(this.#map.entries()).forEach(([name, value])=>{
+            cb([name, value instanceof ReactZone ? value.val() : value])
+        })
     }
     add(name, val) {
         if (val instanceof ReactZone) {
             // 添加监听，修改的时候进行更新
             val.addWatcher(this.emiter)
         }
-        this.map.add(name, val)
+        this.#map.set(name, val)
         return this
     }
 }
 
-export class RNodeGroup extends Reactable {
+export class _RGroup extends _Reactable {
+    getList() { return [] }
+}
+
+export class RNodeGroup extends _RGroup {
     #list = []
     getList() {
         return this.#list.map(
-            v => v instanceof RNodeGroup ? v.getList()
+            v => v instanceof _RGroup ? v.getList()
                 : v instanceof RNode ? v
                     : new Error('should be rNode!'))
     }
@@ -83,15 +89,14 @@ export class RNode {
 
     current = null
 
-    constructor(option = {}) {
-        const {
-            tag,
-            style,
-            event,
-            attr,
-            children,
-            text
-        } = option
+    constructor({
+        tag,
+        style,
+        event,
+        attr,
+        children,
+        text
+    }) {
 
         this.#tag = tag || this.#tag
         this.#text = text || this.#text
@@ -120,6 +125,7 @@ export class RNode {
 
     #updateStyle() {
         this.#style.each(([name, value]) => {
+            console.log([name, value])
             this.current.style[name] = value
         })
     }
@@ -134,21 +140,76 @@ export class RNode {
         })
     }
     #updateChildren() {
-        if(this.#text.getText() !== null) return 
+        if (this.#text.getText() !== null) return
 
         this.#children.getList().forEach(v => {
             this.current.appendChild(v.current)
         })
     }
-    #updateText() { 
-        if(this.#text.getText() === null) return 
-        
+    #updateText() {
+        if (this.#text.getText() === null) return
         this.current.innerText = this.#text.getText()
     }
 }
 
-export class RNodeCase extends RNodeGroup {
-    #val = false 
+export class RNodeCase extends _RGroup {
+    #val = false
+    #node = null
+
+    constructor(val, node) {
+        this.#node = node
+        this.#val = val
+        if (this.#val instanceof ReactZone) {
+            this.#val.addWatcher(this.emiter)
+        }
+    }
+
+    getList() {
+        const val = this.#val instanceof ReactZone ? this.#val.val() : this.#val
+
+        if (val && this.#node) return [this.#node]
+        else return []
+    }
+}
+
+export class RNodeLoop extends _RGroup {
+    #val = []
+    #cache = new Map()
+    #createNode = (val, i) => { }
+    #createKey = (val, i) => val
+
+    constructor({
+        createNode,
+        createKey,
+        val
+    }) {
+        this.#val = val
+        this.#createKey = createKey
+        this.#createNode = createNode
+
+        if (this.#val instanceof ReactZone) {
+            this.#val.addWatcher(this.emiter)
+        }
+    }
+
+    getList() {
+        const arr = this.#val instanceof ReactZone
+            ? this.#val.val()
+            : this.#val
+        const newCache = new Map()
+        const oldCache = this.#cache
+        const list = arr.map((v, i) => {
+            const key = this.#createKey(v, i)
+            const node = oldCache.has(key)
+                ? oldCache.get(key)
+                : this.#createNode(v, i)
+
+            newCache.set(key, node)
+            return node
+        })
+        this.#cache = newCache
+        return list
+    }
 }
 
 

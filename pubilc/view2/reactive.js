@@ -1,3 +1,11 @@
+
+export class Watcher {
+    constructor(cb) { this.#cb = cb }
+    #cb = () => { }
+    emit() { this.#cb() }
+}
+
+
 export class ReactZone extends Watcher {
 
     constructor(list, transformer) {
@@ -5,6 +13,7 @@ export class ReactZone extends Watcher {
         this.#transfromer = transformer
         this.#inputs = list
         this.#inputs.filter(v => v instanceof ReactZone).forEach(v => v.addWatcher(this))
+        this.#update()
     }
 
     // 当前缓存的值
@@ -31,6 +40,7 @@ export class ReactZone extends Watcher {
     }
 
     val() { return this.#output }
+    set(...list) { this.#inputs = list; this.#update()}
 
     // 衍生一个新 rz 对象
     map(cb) {
@@ -39,11 +49,6 @@ export class ReactZone extends Watcher {
 
 }
 
-export class Watcher {
-    constructor(cb) { this.#cb = cb }
-    #cb = () => { }
-    emit() { this.#cb() }
-}
 
 export const zone = (...args) => new ReactZone(args, v => v)
 
