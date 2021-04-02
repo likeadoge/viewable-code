@@ -38,7 +38,7 @@ export class RText extends _Reactable {
 export class ROption extends _Reactable {
     #map = new Map()
     each(cb) {
-        Array.from(this.#map.entries()).forEach(([name, value])=>{
+        Array.from(this.#map.entries()).forEach(([name, value]) => {
             cb([name, value instanceof ReactZone ? value.val() : value])
         })
     }
@@ -125,7 +125,6 @@ export class RNode {
 
     #updateStyle() {
         this.#style.each(([name, value]) => {
-            console.log([name, value])
             this.current.style[name] = value
         })
     }
@@ -141,6 +140,10 @@ export class RNode {
     }
     #updateChildren() {
         if (this.#text.getText() !== null) return
+
+        while (this.current.firstChild) {
+            this.current.removeChild(this.current.firstChild);
+        }
 
         this.#children.getList().forEach(v => {
             this.current.appendChild(v.current)
@@ -183,8 +186,9 @@ export class RNodeLoop extends _RGroup {
         createKey,
         val
     }) {
+        super()
         this.#val = val
-        this.#createKey = createKey
+        this.#createKey = createKey || this.#createKey
         this.#createNode = createNode
 
         if (this.#val instanceof ReactZone) {
